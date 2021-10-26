@@ -31,6 +31,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
                                           glm::vec2(-1, -1),
                                           glm::vec2( 1, -1)};
   glm::vec2 m_P{};
+  
 
   void setupModel();
 };

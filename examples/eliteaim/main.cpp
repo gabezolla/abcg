@@ -22,5 +22,6 @@ int main(int argc, char **argv) {
     fmt::print(stderr, "{}", exception.what());
     return -1;
   }
+  
   return 0;
 }

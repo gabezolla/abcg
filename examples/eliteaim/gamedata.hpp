@@ -3,7 +3,7 @@
 
 #include <bitset>
 
-enum class Input { Fire };
+enum class Input {  };
 enum class State { Playing, GameOver, Win };
 
 struct GameData {

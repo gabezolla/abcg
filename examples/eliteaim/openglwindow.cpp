@@ -10,7 +10,7 @@ void OpenGLWindow::initializeGL() {
     #version 410
     layout(location = 0) in vec2 inPosition;
     void main() { 
-      gl_PointSize = 50.0;
+      gl_PointSize = 20.0;
       gl_Position = vec4(inPosition, 0, 1); 
     }
   )gl"};
