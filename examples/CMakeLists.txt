@@ -1,5 +1,3 @@
 add_subdirectory(helloworld)
 
-add_subdirectory(firstapp)
-
-add_subdirectory(elite-aim)
+add_subdirectory(eliteaim)
