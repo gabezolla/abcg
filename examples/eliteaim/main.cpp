@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
                                .majorVersion = 4,
                                .minorVersion = 1});
     window->setWindowSettings(
-        {.width = 600, .height = 600, .title = "Hello, World!"});
+        {.width = 800, .height = 800, .title = "Elite Aim"});
 
     // Run application
     app.run(std::move(window));

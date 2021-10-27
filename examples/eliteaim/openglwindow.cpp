@@ -5,13 +5,30 @@
 
 #include <chrono>
 
-void OpenGLWindow::initializeGL() {
-  const auto *vertexShader{R"gl(
+void OpenGLWindow::initializeGL() {  
+
+  // Clear window
+  abcg::glClearColor(0, 0, 0, 1);
+  abcg::glClear(GL_COLOR_BUFFER_BIT);
+
+  /* const auto *vertexShader{R"gl(
     #version 410
     layout(location = 0) in vec2 inPosition;
-    void main() { 
-      gl_PointSize = 20.0;
-      gl_Position = vec4(inPosition, 0, 1); 
+
+    uniform vec4 color;
+    uniform vec2 translation;
+    uniform float rotation;
+
+    out vec4 fragColor;
+
+    void main() {
+      float sinAngle = sin(rotation);
+      float cosAngle = cos(rotation);
+      vec2 rotated = vec2(inPosition.x * cosAngle - inPosition.y * sinAngle,
+                          inPosition.x * sinAngle + inPosition.y * cosAngle); 
+
+      gl_Position = vec4(rotated + translation, 0, 100);
+      fragColor = color;
     }
   )gl"};
 
@@ -21,12 +38,10 @@ void OpenGLWindow::initializeGL() {
     void main() { outColor = vec4(1); }
   )gl"};
 
-  // Create shader program
-  m_program = createProgramFromString(vertexShader, fragmentShader);
+  */
 
-  // Clear window
-  abcg::glClearColor(0, 0, 0, 1);
-  abcg::glClear(GL_COLOR_BUFFER_BIT);
+  // Create program to render targets
+  m_objectsProgram = createProgramFromFile(getAssetsPath() + "target.vert", getAssetsPath() + "target.frag");
 
   std::array<GLfloat, 2> sizes{};
 #if !defined(__EMSCRIPTEN__)
@@ -39,38 +54,26 @@ void OpenGLWindow::initializeGL() {
 }
 
 void OpenGLWindow::paintGL() {
-  // Create OpenGL buffers for the single point at m_P
-  setupModel();
 
-  // Set the viewport
+  abcg::glClear(GL_COLOR_BUFFER_BIT);
   abcg::glViewport(0, 0, m_viewportWidth, m_viewportHeight);
-
-  // Start using the shader program
-  abcg::glUseProgram(m_program);
-  // Start using VAO
-  abcg::glBindVertexArray(m_vao);
-
-  // Draw a single point
-  abcg::glDrawArrays(GL_POINTS, 0, 1);
-
-  // End using VAO
-  abcg::glBindVertexArray(0);
-  // End using the shader program
-  abcg::glUseProgram(0);
-
+  update();
   // Appears target every 5 seconds
   if(m_WaitTimer.elapsed() > 5) {
     std::uniform_real_distribution<float> intDistribution(-1.0f, 1.0f);
     m_randomEngine.seed(std::chrono::steady_clock::now().time_since_epoch().count());
-    m_P.x = intDistribution(m_randomEngine);
-    m_P.y = intDistribution(m_randomEngine);
+    m_target.paintGL();
     m_WaitTimer.restart();
   }
+
+}
+
+void OpenGLWindow::update() {
+
 }
 
 void OpenGLWindow::paintUI() {
   abcg::OpenGLWindow::paintUI();
-
   {
     ImGui::SetNextWindowPos(ImVec2(5, 5 + 50 + 16 + 5));
     ImGui::Begin(" ", nullptr, ImGuiWindowFlags_NoDecoration);
@@ -83,6 +86,33 @@ void OpenGLWindow::paintUI() {
   }
 }
 
+void OpenGLWindow::handleEvent(SDL_Event &event) {  
+  // Mouse events
+  if (event.type == SDL_MOUSEBUTTONDOWN) {
+    if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT)
+      m_gameData.m_input.set(static_cast<size_t>(Input::Shoot));
+  }
+  if (event.type == SDL_MOUSEBUTTONUP) {
+    if (event.button.button == SDL_BUTTON_LEFT)
+      m_gameData.m_input.reset(static_cast<size_t>(Input::Shoot));
+    if (event.button.button == SDL_BUTTON_RIGHT)
+      m_gameData.m_input.reset(static_cast<size_t>(Input::Shoot));
+  }
+
+  if (event.type == SDL_MOUSEMOTION) {
+    glm::ivec2 mousePosition;
+    SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
+
+    glm::vec2 direction{glm::vec2{mousePosition.x - m_viewportWidth / 2,
+                                  mousePosition.y - m_viewportHeight / 2}};
+    direction.y = -direction.y;
+
+    /* if(direction.x == target.x && direction.y == target.y) {
+      // aumenta contador, some o target
+    } */
+  }
+}
+
 void OpenGLWindow::resizeGL(int width, int height) {
   m_viewportWidth = width;
   m_viewportHeight = height;
@@ -91,13 +121,10 @@ void OpenGLWindow::resizeGL(int width, int height) {
 }
 
 void OpenGLWindow::terminateGL() {
-  // Release shader program, VBO and VAO
-  abcg::glDeleteProgram(m_program);
-  abcg::glDeleteBuffers(1, &m_vboVertices);
-  abcg::glDeleteVertexArrays(1, &m_vao);
 }
 
-void OpenGLWindow::setupModel() {
+/* void OpenGLWindow::setupModel() {
+  
   // Release previous VBO and VAO
   abcg::glDeleteBuffers(1, &m_vboVertices);
   abcg::glDeleteVertexArrays(1, &m_vao);
@@ -113,7 +140,7 @@ void OpenGLWindow::setupModel() {
 
   // Get location of attributes in the program
   const GLint positionAttribute{
-      abcg::glGetAttribLocation(m_program, "inPosition")};
+      abcg::glGetAttribLocation(m_objectsProgram, "inPosition")};
 
   // Create VAO
   abcg::glGenVertexArrays(1, &m_vao);
@@ -129,4 +156,5 @@ void OpenGLWindow::setupModel() {
 
   // End of binding to current VAO
   abcg::glBindVertexArray(0);
-}
+} 
+*/ 
