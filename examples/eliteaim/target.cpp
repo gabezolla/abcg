@@ -1,8 +1,7 @@
 #include "target.hpp"
 
-/* #include <cppitertools/itertools.hpp>
+#include <cppitertools/itertools.hpp>
 #include <glm/gtx/fast_trigonometry.hpp>
-*/
 
 void Targets::initializeGL(GLuint program, int quantity) {
   terminateGL();
