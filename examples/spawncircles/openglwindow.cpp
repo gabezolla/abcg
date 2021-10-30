@@ -37,12 +37,13 @@ void OpenGLWindow::initializeGL() {
     void main() { outColor = fragColor; }
   )gl"};
 
-  // Create shader program
-  m_program = createProgramFromString(vertexShader, fragmentShader);
-
   // Clear window
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  // Create shader program
+  m_program = createProgramFromFile(getAssetsPath() + "target.vert",
+                                    getAssetsPath() + "target.frag");
 
   // Start pseudo-random number generator
   auto seed{std::chrono::steady_clock::now().time_since_epoch().count()};
@@ -58,32 +59,38 @@ void OpenGLWindow::paintGL() {
   std::uniform_int_distribution<int> intDist(3, 20);
   // auto sides{intDist(m_randomEngine)};
 
+  // m_program = createProgramFromString(vertexShader, fragmentShader);
+
   auto sides{12};
-  setupModel(sides);
 
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 
-  if (m_WaitTimer.elapsed() > 5) {
+  if(m_WaitTimer.elapsed() > 5) {
+
+    setupModel(sides);
     glUseProgram(m_program);
 
     // Choose a random xy position from (-1, -1) to (1, 1)
     std::uniform_real_distribution<float> rd1(-1.0f, 1.0f);
     position = {rd1(m_randomEngine), rd1(m_randomEngine)};
-    GLint translationLocation{glGetUniformLocation(m_program, "translation")};
-    glUniform2fv(translationLocation, 1, &position.x);
 
-    std::uniform_real_distribution<float> intDistribution(-1.0f, 1.0f);
-    m_randomEngine.seed(
-        std::chrono::steady_clock::now().time_since_epoch().count());
-    
-    m_WaitTimer.restart();
+    // Crete target and push into list
+    Target target;
+    target.target_program = m_program;
+    target.position = position;
+    m_list.push_back({target});
+
+    m_gameData.rodadas += 1;
 
     // Choose a random scale factor (1% to 25%)
     // std::uniform_real_distribution<float> rd2(0.01f, 0.25f);
     // auto scale{rd2(m_randomEngine)};
     GLint scaleLocation{glGetUniformLocation(m_program, "scale")};
-    // glUniform1f(scaleLocation, scale);
     glUniform1f(scaleLocation, 0.1f);
+
+    // Set translation
+    GLint translationLocation{glGetUniformLocation(m_program, "translation")};
+    glUniform2fv(translationLocation, 1, &position.x);
 
     // Set the rotation of the little square
     GLint rotationLocation{glGetUniformLocation(m_program, "rotation")};
@@ -94,10 +101,11 @@ void OpenGLWindow::paintGL() {
     glDrawArrays(GL_TRIANGLE_FAN, 0, sides + 2);
     glBindVertexArray(0);
 
-    // checkHit(translation2);
-    m_gameData.rodadas += 1;
-    glUseProgram(0);
+    // Restart timer to build another target
+    m_WaitTimer.restart();    
   }
+
+   glUseProgram(0);
 }
 
 void OpenGLWindow::paintUI() {
@@ -112,9 +120,11 @@ void OpenGLWindow::paintUI() {
     ImGui::Begin(" ", nullptr, windowFlags);
 
     ImGui::Text("Total de acertos: %d", m_gameData.acertos);
-    ImGui::Text("Total de tentativas: %d", m_gameData.rodadas);
+    ImGui::Text("Total de alvos: %d", m_gameData.rodadas);
     ImGui::Text("Posição: %f %f", position.x, position.y);
-    ImGui::Text("Mouse: %f %f", m_gameData.posicaoMouse.x, m_gameData.posicaoMouse.y);
+    ImGui::Text("VAO VBO: %d %d", m_vao, m_vboPositions);
+    ImGui::Text("Mouse: %f %f", m_gameData.posicaoMouse.x,
+                m_gameData.posicaoMouse.y);
 
     if (ImGui::Button("Reiniciar", ImVec2(-1, 30))) {
       glClear(GL_COLOR_BUFFER_BIT);
@@ -129,8 +139,6 @@ void OpenGLWindow::paintUI() {
 void OpenGLWindow::resizeGL(int width, int height) {
   m_viewportWidth = width;
   m_viewportHeight = height;
-
-  glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void OpenGLWindow::terminateGL() {
@@ -222,8 +230,8 @@ void OpenGLWindow::handleEvent(SDL_Event &event) {
     glm::ivec2 mousePosition;
     SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
     m_gameData.posicaoMouse = {
-        glm::vec2{(mousePosition.x - m_viewportWidth / 2.0f)/300.0f,
-                  (mousePosition.y - m_viewportHeight / 2.0f)/300.0f}};
+        glm::vec2{(mousePosition.x - m_viewportWidth / 2.0f) / 300.0f,
+                  (mousePosition.y - m_viewportHeight / 2.0f) / 300.0f}};
 
     m_gameData.posicaoMouse.y = -m_gameData.posicaoMouse.y;
     checkHit();
@@ -231,22 +239,27 @@ void OpenGLWindow::handleEvent(SDL_Event &event) {
   }
 }
 
+/* void OpenGLWindow::removeTarget(Target target) {
+  glDeleteBuffers(1, &target.target_vboColor);
+  glDeleteBuffers(1, &target.target_vboPosition);
+  glDeleteVertexArrays(1, &target.target_vao);
+} */
+
 void OpenGLWindow::checkHit() {
   // GLint translationScale{glGetUniformLocation(m_program, "scale")};
 
-  const auto distance{glm::distance(m_gameData.posicaoMouse, position)};
-  fmt::print("D: {} M: {} P: {}", distance, m_gameData.posicaoMouse.x,
-             position.x);
+  for (auto &target : m_list) {
+    glm::vec2 position = {target.position.x, target.position.y};
+    
+    const auto distance{glm::distance(m_gameData.posicaoMouse, position)};
 
-  if (distance < 0.1f) {
-    m_gameData.acertos += 1;
+    if (distance < 0.1f) {
+      target.m_hit = true;
+      m_list.remove_if([](const Target &t) { return t.m_hit; });
+      // removeTarget(target)
+      GLint scaleLocation{glGetUniformLocation(target.target_program, "scale")};
+      glUniform1f(scaleLocation, 0);
+      m_gameData.acertos += 1;
+    }
   }
-
-  // if(((translation.x + 1000 > m_gameData.posicaoMouse.x && translation.x -
-  // 1000 < m_gameData.posicaoMouse.x) && (translation.y + 1000 >
-  // m_gameData.posicaoMouse.y && translation.y - 1000 <
-  // m_gameData.posicaoMouse.y ))){
-  //   m_gameData.acertos += 1;
-  // unrender(shader)
-  // }
 }
