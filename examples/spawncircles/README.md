@@ -22,7 +22,7 @@ Atualmente, o game possui dois modos distintos: o Speed e o Precision. O primeir
 
 Além disso, o jogo conta com quatro dificuldades: easy, medium, hard e impossible. Para o modo Speed, à medida que se aumentam os níveis, mais curta é a duração do alvo na tela. No modo Precision, por sua vez, ele se torna cada vez menor.
 
-<hr style="border:2px solid gray"> </hr>
+<hr style="border:1px solid gray"> </hr>
 
 ### :shipit: **Details** :shipit:
 A implementação conta com uma interface de botões para escolher o modo e os níveis, bem como um Scoreboard para o jogador averiguar a quantidade de pontos que conquistou e quantos alvos já foram gerados.
