@@ -11,9 +11,9 @@ Este repositório contém o código-fonte do Aim Elite, projeto desenvolvido par
 ### :bangbang: **Merchandising** :bangbang:
 Você anda jogando Valorant, Counter-Strike, Rainbow Six, mas acaba errando todos os tiros e perdendo o jogo? O Aim Elite é ideal para você!
 
-Para todos os apaixonados pelo gênero FPS: antes de entrar em uma partida ranqueada, o Aim Elite funciona como um aquecimento para treinar tanto a **precisão** quanto a **velocidade** da mira. Assim, os seus tiros ficarão muito mais precisos, você conseguirá surpreender os seus inimigos e alcançar a vitória.
+Para todos os apaixonados pelo gênero FPS: antes de entrar em uma partida ranqueada, o Aim Elite funciona como um aquecimento para treinar tanto a <span style="text-decoration: underline">**precisão**</span> quanto a <span style="text-decoration: underline">**velocidade**</span> da mira. Assim, os seus tiros ficarão muito mais precisos, você conseguirá surpreender os seus inimigos e alcançar a vitória.
 
-<hr style="border:2px solid gray"> </hr>
+<hr style="border:1px solid gray"> </hr>
 
 ### :joystick: **How to Play** :joystick:
 De forma simplificada, a mecânica do jogo se baseia em círculos que são renderizados na tela e somem após determinado tempo. À medida que os alvos aparecem, o usuário deve clicar nos mesmos para pontuar.
