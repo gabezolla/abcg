@@ -90,8 +90,8 @@ void OpenGLWindow::paintUI() {
                      ImGuiWindowFlags_NoTitleBar};
     ImGui::Begin(" ", nullptr, windowFlags);
 
-    ImGui::Text("Total de targetHits: %d", m_gameData.targetHits);
-    ImGui::Text("Total de alvos: %d", m_gameData.rounds);
+    ImGui::Text("Targets hit: %d", m_gameData.targetHits);
+    ImGui::Text("Targets spawned: %d", m_gameData.rounds);
     
     if (ImGui::Button("Voltar", ImVec2(-1, 30))) {
       glClear(GL_COLOR_BUFFER_BIT);
