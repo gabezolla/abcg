@@ -2,6 +2,7 @@
 ### Projeto 1 - Computação Gráfica
 
 Autores: **Gabriel Zolla Juarez - RA: 11201721446**
+
 **Pedro Henrique Batistela Lopes - RA: 11201722043**
 
 **Link do repositório do código-fonte:** https://github.com/gabezolla/abcg/blob/main/examples/aim-elite/README.md
