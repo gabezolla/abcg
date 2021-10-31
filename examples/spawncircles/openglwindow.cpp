@@ -281,12 +281,6 @@ void OpenGLWindow::handleEvent(SDL_Event &event) {
   }
 }
 
-/* void OpenGLWindow::removeTarget(Target target) {
-  glDeleteBuffers(1, &target.target_vboColor);
-  glDeleteBuffers(1, &target.target_vboPosition);
-  glDeleteVertexArrays(1, &target.target_vao);
-} */
-
 void OpenGLWindow::checkHit() {
   for (auto &target : m_list) {
     glm::vec2 position = {target.position.x, target.position.y};
