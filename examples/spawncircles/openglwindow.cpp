@@ -25,7 +25,7 @@ void OpenGLWindow::initializeGL() {
 }
 
 void OpenGLWindow::paintGL() {
-  if (m_gameData.m_state == State::Menu) return;
+  if (m_gameData.m_state == State::Menu || m_gameData.m_diff == Difficulty::None) return;
   auto sides{12};
 
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
@@ -71,6 +71,7 @@ void OpenGLWindow::paintGL() {
   // Function to delete circle spawned
   if (m_elapsedTimer.elapsed() > unspawnTime) {
     abcg::glClear(GL_COLOR_BUFFER_BIT);
+    m_list = {};
     m_elapsedTimer.restart();
   }
 
@@ -79,7 +80,7 @@ void OpenGLWindow::paintGL() {
 
 void OpenGLWindow::paintUI() {
 
-  if (m_gameData.m_diff != Difficulty::None) {
+  if (m_gameData.m_state != State::Menu && m_gameData.m_diff != Difficulty::None) {
     auto widgetSize{ImVec2(200, 90)};
     ImGui::SetNextWindowPos(ImVec2(m_viewportWidth - widgetSize.x - 5,
                                    m_viewportHeight - widgetSize.y - 5));
@@ -102,9 +103,9 @@ void OpenGLWindow::paintUI() {
   }
   
   else if (m_gameData.m_state == State::Menu && m_gameData.m_diff == Difficulty::None) {
-    auto widgetSize{ImVec2(300, 300)};
-    ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - widgetSize.x,
-                                   (m_viewportHeight / 2) - widgetSize.y));
+    auto widgetSize{ImVec2(215, 220)};
+    ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - 120,
+                                   (m_viewportHeight / 2) - 120));
     ImGui::SetNextWindowSize(widgetSize);
     auto windowFlags{ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoTitleBar};
@@ -123,9 +124,9 @@ void OpenGLWindow::paintUI() {
   }
 
   else if(m_gameData.m_state != State::Menu && m_gameData.m_diff == Difficulty::None){
-    auto widgetSize{ImVec2(300, 300)};
-    ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - widgetSize.x,
-                                   (m_viewportHeight / 2) - widgetSize.y));
+    auto widgetSize{ImVec2(215, 430)};
+    ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - 120,
+                                   (m_viewportHeight / 2) - 220));
     ImGui::SetNextWindowSize(widgetSize);
     auto windowFlags{ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoTitleBar};
@@ -134,9 +135,11 @@ void OpenGLWindow::paintUI() {
     if (ImGui::Button("Easy", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
         unspawnTime = 1.0f;
+        circleScale = 0.10f;
       }
       else if(m_gameData.m_state == State::Precision) {
-        circleScale = 0.15f;
+        circleScale = 0.10f;
+        unspawnTime = 1.0f;
       }
       m_gameData.m_diff = Difficulty::Easy;
       m_WaitTimer.restart();
@@ -145,9 +148,11 @@ void OpenGLWindow::paintUI() {
     if (ImGui::Button("Medium", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
         unspawnTime = 0.75f;
+        circleScale = 0.10f;
       }
       else if(m_gameData.m_state == State::Precision) {
-        circleScale = 0.10f;
+        circleScale = 0.075f;
+        unspawnTime = 1.0f;
       }
       m_gameData.m_diff = Difficulty::Easy;
       m_WaitTimer.restart();
@@ -155,10 +160,12 @@ void OpenGLWindow::paintUI() {
 
     if (ImGui::Button("Hard", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
-        unspawnTime = 0.75f;
+        unspawnTime = 0.5f;
+        circleScale = 0.10f;
       }
       else if(m_gameData.m_state == State::Precision) {
-        circleScale = 0.05f;
+        circleScale = 0.025f;
+        unspawnTime = 1.0f;
       }
       m_gameData.m_diff = Difficulty::Easy;
       m_WaitTimer.restart();
@@ -166,10 +173,12 @@ void OpenGLWindow::paintUI() {
 
     if (ImGui::Button("Impossible", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
-        unspawnTime = 0.5f;
+        unspawnTime = 0.25f;
+        circleScale = 0.10f;
       }
       else if(m_gameData.m_state == State::Precision) {
         circleScale = 0.01f;
+        unspawnTime = 1.0f;
       }
       m_gameData.m_diff = Difficulty::Easy;
       m_WaitTimer.restart();

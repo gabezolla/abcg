@@ -34,7 +34,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   float spawnTime{3.0f};
   float unspawnTime{1.0f};
-  float circleScale{0.15f};
+  float circleScale{0.10f};
   GameData m_gameData;
   glm::vec2 position{};
 
