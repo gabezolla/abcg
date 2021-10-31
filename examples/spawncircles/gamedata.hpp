@@ -3,12 +3,14 @@
 
 #include <bitset>
 
-enum class Input { Right, Left, Down, Up, Fire };
-enum class State { Playing};
+enum class Input { Fire };
+enum class State { Precision, Speed, Menu };
+enum class Difficulty { None, Easy, Medium, Hard, Impossible };
 
 struct GameData {
-  State m_state{State::Playing};
-  std::bitset<5> m_input;  // [up, down, left, right]
+  State m_state{State::Menu};
+  Difficulty m_diff{Difficulty::None};
+  std::bitset<5> m_input;
   int acertos = 0;
   int rodadas = 0;
   glm::vec2 posicaoMouse;

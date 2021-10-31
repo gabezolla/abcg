@@ -9,34 +9,6 @@
 #include "abcg.hpp"
 
 void OpenGLWindow::initializeGL() {
-  const auto *vertexShader{R"gl(
-    #version 410
-    layout(location = 0) in vec2 inPosition;
-    layout(location = 1) in vec4 inColor;
-    uniform vec2 translation;
-    uniform float scale;
-    uniform float rotation;
-    out vec4 fragColor;
-    void main() {
-        float sinAngle = sin(rotation);
-        float cosAngle = cos(rotation);
-      vec2 newPosition = vec2(
-          inPosition.x * cosAngle - inPosition.y * sinAngle,
-          inPosition.x * sinAngle + inPosition.y * cosAngle
-      ); 
-      newPosition = newPosition * scale + translation;
-      gl_Position = vec4(newPosition, 0, 1);
-      fragColor = inColor;
-    }
-  )gl"};
-
-  const auto *fragmentShader{R"gl(
-    #version 410
-    in vec4 fragColor;
-    out vec4 outColor;
-    void main() { outColor = fragColor; }
-  )gl"};
-
   // Clear window
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -45,28 +17,21 @@ void OpenGLWindow::initializeGL() {
   m_program = createProgramFromFile(getAssetsPath() + "target.vert",
                                     getAssetsPath() + "target.frag");
 
+  m_gameData.m_state = State::Menu;
+
   // Start pseudo-random number generator
   auto seed{std::chrono::steady_clock::now().time_since_epoch().count()};
   m_randomEngine.seed(seed);
 }
 
 void OpenGLWindow::paintGL() {
-  // Check whether to render the next polygon
-  if (m_elapsedTimer.elapsed() < m_delay / 1000.0) return;
-  m_elapsedTimer.restart();
-
-  // Create a regular polygon with a number of sides in the range [3;20]
-  std::uniform_int_distribution<int> intDist(3, 20);
-  // auto sides{intDist(m_randomEngine)};
-
-  // m_program = createProgramFromString(vertexShader, fragmentShader);
-
+  if (m_gameData.m_state == State::Menu) return;
   auto sides{12};
 
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 
-  if(m_WaitTimer.elapsed() > 5) {
-
+  if (m_WaitTimer.elapsed() > spawnTime) {
+    m_elapsedTimer.restart();
     setupModel(sides);
     glUseProgram(m_program);
 
@@ -82,11 +47,9 @@ void OpenGLWindow::paintGL() {
 
     m_gameData.rodadas += 1;
 
-    // Choose a random scale factor (1% to 25%)
-    // std::uniform_real_distribution<float> rd2(0.01f, 0.25f);
-    // auto scale{rd2(m_randomEngine)};
+    // Scale factor
     GLint scaleLocation{glGetUniformLocation(m_program, "scale")};
-    glUniform1f(scaleLocation, 0.1f);
+    glUniform1f(scaleLocation, circleScale);
 
     // Set translation
     GLint translationLocation{glGetUniformLocation(m_program, "translation")};
@@ -102,15 +65,21 @@ void OpenGLWindow::paintGL() {
     glBindVertexArray(0);
 
     // Restart timer to build another target
-    m_WaitTimer.restart();    
+    m_WaitTimer.restart();
   }
 
-   glUseProgram(0);
+  // Function to delete circle spawned
+  if (m_elapsedTimer.elapsed() > unspawnTime) {
+    abcg::glClear(GL_COLOR_BUFFER_BIT);
+    m_elapsedTimer.restart();
+  }
+
+  glUseProgram(0);
 }
 
 void OpenGLWindow::paintUI() {
-  abcg::OpenGLWindow::paintUI();
-  {
+
+  if (m_gameData.m_diff != Difficulty::None) {
     auto widgetSize{ImVec2(200, 90)};
     ImGui::SetNextWindowPos(ImVec2(m_viewportWidth - widgetSize.x - 5,
                                    m_viewportHeight - widgetSize.y - 5));
@@ -121,15 +90,89 @@ void OpenGLWindow::paintUI() {
 
     ImGui::Text("Total de acertos: %d", m_gameData.acertos);
     ImGui::Text("Total de alvos: %d", m_gameData.rodadas);
-    ImGui::Text("Posição: %f %f", position.x, position.y);
-    ImGui::Text("VAO VBO: %d %d", m_vao, m_vboPositions);
-    ImGui::Text("Mouse: %f %f", m_gameData.posicaoMouse.x,
-                m_gameData.posicaoMouse.y);
-
-    if (ImGui::Button("Reiniciar", ImVec2(-1, 30))) {
+    
+    if (ImGui::Button("Voltar", ImVec2(-1, 30))) {
       glClear(GL_COLOR_BUFFER_BIT);
+      m_gameData.m_diff = Difficulty::None;
+      m_gameData.m_state = State::Menu;
       m_gameData.acertos = 0;
       m_gameData.rodadas = 0;
+    }
+    ImGui::End();
+  }
+  
+  else if (m_gameData.m_state == State::Menu && m_gameData.m_diff == Difficulty::None) {
+    auto widgetSize{ImVec2(300, 300)};
+    ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - widgetSize.x,
+                                   (m_viewportHeight / 2) - widgetSize.y));
+    ImGui::SetNextWindowSize(widgetSize);
+    auto windowFlags{ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoTitleBar};
+
+    ImGui::Begin(" ", nullptr, windowFlags);
+    if (ImGui::Button("Speed", ImVec2(200, 100))) {
+      m_gameData.m_state = State::Speed;
+      m_WaitTimer.restart();
+    }
+
+    if (ImGui::Button("Precision", ImVec2(200, 100))) {
+      m_gameData.m_state = State::Precision;
+      m_WaitTimer.restart();
+    }
+    ImGui::End();
+  }
+
+  else if(m_gameData.m_state != State::Menu && m_gameData.m_diff == Difficulty::None){
+    auto widgetSize{ImVec2(300, 300)};
+    ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - widgetSize.x,
+                                   (m_viewportHeight / 2) - widgetSize.y));
+    ImGui::SetNextWindowSize(widgetSize);
+    auto windowFlags{ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoTitleBar};
+
+    ImGui::Begin(" ", nullptr, windowFlags);
+    if (ImGui::Button("Easy", ImVec2(200, 100))) {
+      if(m_gameData.m_state == State::Speed) {
+        unspawnTime = 1.0f;
+      }
+      else if(m_gameData.m_state == State::Precision) {
+        circleScale = 0.15f;
+      }
+      m_gameData.m_diff = Difficulty::Easy;
+      m_WaitTimer.restart();
+    }
+
+    if (ImGui::Button("Medium", ImVec2(200, 100))) {
+      if(m_gameData.m_state == State::Speed) {
+        unspawnTime = 0.75f;
+      }
+      else if(m_gameData.m_state == State::Precision) {
+        circleScale = 0.10f;
+      }
+      m_gameData.m_diff = Difficulty::Easy;
+      m_WaitTimer.restart();
+    }
+
+    if (ImGui::Button("Hard", ImVec2(200, 100))) {
+      if(m_gameData.m_state == State::Speed) {
+        unspawnTime = 0.75f;
+      }
+      else if(m_gameData.m_state == State::Precision) {
+        circleScale = 0.05f;
+      }
+      m_gameData.m_diff = Difficulty::Easy;
+      m_WaitTimer.restart();
+    }
+
+    if (ImGui::Button("Impossible", ImVec2(200, 100))) {
+      if(m_gameData.m_state == State::Speed) {
+        unspawnTime = 0.5f;
+      }
+      else if(m_gameData.m_state == State::Precision) {
+        circleScale = 0.01f;
+      }
+      m_gameData.m_diff = Difficulty::Easy;
+      m_WaitTimer.restart();
     }
 
     ImGui::End();
@@ -235,7 +278,6 @@ void OpenGLWindow::handleEvent(SDL_Event &event) {
 
     m_gameData.posicaoMouse.y = -m_gameData.posicaoMouse.y;
     checkHit();
-    // m_gameData.m_state = State::Playing;
   }
 }
 
@@ -246,19 +288,14 @@ void OpenGLWindow::handleEvent(SDL_Event &event) {
 } */
 
 void OpenGLWindow::checkHit() {
-  // GLint translationScale{glGetUniformLocation(m_program, "scale")};
-
   for (auto &target : m_list) {
     glm::vec2 position = {target.position.x, target.position.y};
-    
+
     const auto distance{glm::distance(m_gameData.posicaoMouse, position)};
 
-    if (distance < 0.1f) {
+    if (distance < circleScale) {
       target.m_hit = true;
       m_list.remove_if([](const Target &t) { return t.m_hit; });
-      // removeTarget(target)
-      GLint scaleLocation{glGetUniformLocation(target.target_program, "scale")};
-      glUniform1f(scaleLocation, 0);
       m_gameData.acertos += 1;
     }
   }

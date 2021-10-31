@@ -14,8 +14,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   void paintUI() override;
   void resizeGL(int width, int height) override;
   void terminateGL() override;
-  void handleEvent(SDL_Event& event) override;
-  
+  void handleEvent(SDL_Event& event) override;  
 
  private:
   GLuint m_vao{};
@@ -33,6 +32,9 @@ class OpenGLWindow : public abcg::OpenGLWindow {
     glm::vec2 position;
   };
 
+  float spawnTime{3.0f};
+  float unspawnTime{1.0f};
+  float circleScale{0.15f};
   GameData m_gameData;
   glm::vec2 position{};
 
@@ -40,7 +42,6 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   
   std::default_random_engine m_randomEngine;
 
-  int m_delay{200};
   abcg::ElapsedTimer m_elapsedTimer;
   abcg::ElapsedTimer m_WaitTimer;
 

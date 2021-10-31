@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     window->setOpenGLSettings(
         {.samples = 2, .preserveWebGLDrawingBuffer = true});
     window->setWindowSettings(
-        {.width = 600, .height = 600, .showFPS = true, .showFullscreenButton = false, .title = "Teste"});
+        {.width = 600, .height = 600, .showFPS = false, .showFullscreenButton = false, .title = "Teste"});
 
     // Run application
     app.run(std::move(window));
