@@ -5,8 +5,10 @@ Autores: **Gabriel Zolla Juarez - RA: 11201721446**
 **Pedro Henrique Batistela Lopes - RA: 11201722043**
 
 **Link do repositório do código-fonte:** https://github.com/gabezolla/abcg/blob/main/examples/aim-elite/README.md
+
 **Link para a página Web com a aplicação em WebAssembly:** https://gabezolla.github.io/abcg/aim-elite/ 
 (OBS: funcionamento parcial em WebAssembly, pois a aplicação gerou inconsistências de versão no binário)
+
 **Link para o vídeo demonstrativo:** https://gabezolla.github.io/abcg/aim-elite/
 
 Este repositório contém o código-fonte do Aim Elite, projeto desenvolvido para a disciplina de Computação Gráfica, ministrada pelo Prof. Bruno Dorta. Como referência, utilizou-se principalmente a implementação do projeto de renderização de polímeros regulares, realizado durante as aulas, bem como as bibliotecas **abcg** e o **ImGui**, aliadas ao OpenGL. 
