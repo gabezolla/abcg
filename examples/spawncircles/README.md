@@ -13,7 +13,7 @@ Você anda jogando Valorant, Counter-Strike, Rainbow Six, mas acaba errando todo
 
 Para todos os apaixonados pelo gênero FPS: antes de entrar em uma partida ranqueada, o Aim Elite funciona como um aquecimento para treinar tanto a **precisão** quanto a **velocidade** da mira. Assim, os seus tiros ficarão muito mais precisos, você conseguirá surpreender os seus inimigos e alcançar a vitória.
 
-<hr style="border:2px solid gray"> </hr>
+<hr style="border:1px solid gray"> </hr>
 
 ### :joystick: **How to Play** :joystick:
 De forma simplificada, a mecânica do jogo se baseia em círculos que são renderizados na tela e somem após determinado tempo. À medida que os alvos aparecem, o usuário deve clicar nos mesmos para pontuar.
@@ -22,7 +22,7 @@ Atualmente, o game possui dois modos distintos: o Speed e o Precision. O primeir
 
 Além disso, o jogo conta com quatro dificuldades: easy, medium, hard e impossible. Para o modo Speed, à medida que se aumentam os níveis, mais curta é a duração do alvo na tela. No modo Precision, por sua vez, ele se torna cada vez menor.
 
-<hr style="border:2px solid gray"> </hr>
+<hr style="border:1px solid gray"> </hr>
 
 ### :shipit: **Details** :shipit:
 A implementação conta com uma interface de botões para escolher o modo e os níveis, bem como um Scoreboard para o jogador averiguar a quantidade de pontos que conquistou e quantos alvos já foram gerados.
