@@ -8,6 +8,8 @@ Autores: **Gabriel Zolla Juarez - RA: 11201721446**
 
 Este repositório contém o código-fonte do Aim Elite, projeto desenvolvido para a disciplina de Computação Gráfica, ministrada pelo Prof. Bruno Dorta. Como referência, utilizou-se principalmente a implementação do projeto de renderização de polímeros regulares, realizado durante as aulas, bem como as bibliotecas **abcg** e o **ImGui**, aliadas ao OpenGL. 
 
+<hr style="border:1px solid gray"> </hr>
+
 ### :bangbang: **Merchandising** :bangbang:
 Você anda jogando Valorant, Counter-Strike, Rainbow Six, mas acaba errando todos os tiros e perdendo o jogo? O Aim Elite é ideal para você!
 
