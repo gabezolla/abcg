@@ -5,7 +5,7 @@ Autores: **Gabriel Zolla Juarez - RA: 11201721446**
 
 **Pedro Henrique Batistela Lopes - RA: 11201722043**
 
-**Link do repositório do código-fonte:** https://github.com/gabezolla/abcg/blob/main/examples/aim-elite/README.md
+**Link do repositório do código-fonte:** https://github.com/gabezolla/abcg/tree/main/examples/aim-elite
 
 **Link para a página Web com a aplicação em WebAssembly:** https://gabezolla.github.io/abcg/aim-elite/ 
 (OBS: funcionamento parcial em WebAssembly, pois a aplicação gerou inconsistências de versão no binário)
