@@ -11,8 +11,8 @@ struct GameData {
   State m_state{State::Menu};
   Difficulty m_diff{Difficulty::None};
   std::bitset<5> m_input;
-  int acertos = 0;
-  int rodadas = 0;
+  int targetHits = 0;
+  int rounds = 0;
   glm::vec2 posicaoMouse;
 };
 

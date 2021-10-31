@@ -45,7 +45,7 @@ void OpenGLWindow::paintGL() {
     target.position = position;
     m_list.push_back({target});
 
-    m_gameData.rodadas += 1;
+    m_gameData.rounds += 1;
 
     // Scale factor
     GLint scaleLocation{glGetUniformLocation(m_program, "scale")};
@@ -80,6 +80,7 @@ void OpenGLWindow::paintGL() {
 
 void OpenGLWindow::paintUI() {
 
+  // Game scoreboard
   if (m_gameData.m_state != State::Menu && m_gameData.m_diff != Difficulty::None) {
     auto widgetSize{ImVec2(200, 90)};
     ImGui::SetNextWindowPos(ImVec2(m_viewportWidth - widgetSize.x - 5,
@@ -89,19 +90,20 @@ void OpenGLWindow::paintUI() {
                      ImGuiWindowFlags_NoTitleBar};
     ImGui::Begin(" ", nullptr, windowFlags);
 
-    ImGui::Text("Total de acertos: %d", m_gameData.acertos);
-    ImGui::Text("Total de alvos: %d", m_gameData.rodadas);
+    ImGui::Text("Total de targetHits: %d", m_gameData.targetHits);
+    ImGui::Text("Total de alvos: %d", m_gameData.rounds);
     
     if (ImGui::Button("Voltar", ImVec2(-1, 30))) {
       glClear(GL_COLOR_BUFFER_BIT);
       m_gameData.m_diff = Difficulty::None;
       m_gameData.m_state = State::Menu;
-      m_gameData.acertos = 0;
-      m_gameData.rodadas = 0;
+      m_gameData.targetHits = 0;
+      m_gameData.rounds = 0;
     }
     ImGui::End();
   }
   
+  // Game mode selection menu
   else if (m_gameData.m_state == State::Menu && m_gameData.m_diff == Difficulty::None) {
     auto widgetSize{ImVec2(215, 220)};
     ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - 120,
@@ -123,6 +125,7 @@ void OpenGLWindow::paintUI() {
     ImGui::End();
   }
 
+  // Difficulty selection menu
   else if(m_gameData.m_state != State::Menu && m_gameData.m_diff == Difficulty::None){
     auto widgetSize{ImVec2(215, 430)};
     ImGui::SetNextWindowPos(ImVec2((m_viewportWidth / 2) - 120,
@@ -134,10 +137,12 @@ void OpenGLWindow::paintUI() {
     ImGui::Begin(" ", nullptr, windowFlags);
     if (ImGui::Button("Easy", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
+        // On speed mode, reset circle size to standard (0.10f)
         unspawnTime = 1.0f;
         circleScale = 0.10f;
       }
       else if(m_gameData.m_state == State::Precision) {
+        // On precision mode, reset unspawnTime to standard (1.0f)
         circleScale = 0.10f;
         unspawnTime = 1.0f;
       }
@@ -147,32 +152,37 @@ void OpenGLWindow::paintUI() {
 
     if (ImGui::Button("Medium", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
+        // On speed mode, reset circle size to standard (0.10f)
         unspawnTime = 0.75f;
         circleScale = 0.10f;
       }
       else if(m_gameData.m_state == State::Precision) {
+        // On precision mode, reset unspawnTime to standard (1.0f)
         circleScale = 0.075f;
         unspawnTime = 1.0f;
       }
-      m_gameData.m_diff = Difficulty::Easy;
+      m_gameData.m_diff = Difficulty::Medium;
       m_WaitTimer.restart();
     }
 
     if (ImGui::Button("Hard", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
+        // On speed mode, reset circle size to standard (0.10f)
         unspawnTime = 0.5f;
         circleScale = 0.10f;
       }
       else if(m_gameData.m_state == State::Precision) {
+        // On precision mode, reset unspawnTime to standard (1.0f)
         circleScale = 0.025f;
         unspawnTime = 1.0f;
       }
-      m_gameData.m_diff = Difficulty::Easy;
+      m_gameData.m_diff = Difficulty::Hard;
       m_WaitTimer.restart();
     }
 
     if (ImGui::Button("Impossible", ImVec2(200, 100))) {
       if(m_gameData.m_state == State::Speed) {
+        // On speed mode, reset circle size to standard (0.10f)
         unspawnTime = 0.25f;
         circleScale = 0.10f;
       }
@@ -180,7 +190,7 @@ void OpenGLWindow::paintUI() {
         circleScale = 0.01f;
         unspawnTime = 1.0f;
       }
-      m_gameData.m_diff = Difficulty::Easy;
+      m_gameData.m_diff = Difficulty::Impossible;
       m_WaitTimer.restart();
     }
 
@@ -299,7 +309,7 @@ void OpenGLWindow::checkHit() {
     if (distance < circleScale) {
       target.m_hit = true;
       m_list.remove_if([](const Target &t) { return t.m_hit; });
-      m_gameData.acertos += 1;
+      m_gameData.targetHits += 1;
     }
   }
 }
